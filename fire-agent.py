@@ -1,3 +1,6 @@
+from abc import abstractclassmethod, abstractmethod
+
+
 MAP = """
     #.#########
     #  T      #
@@ -23,6 +26,7 @@ ACTIONS = [UP, DOWN, LEFT, RIGHT,
         NONE]
 
 START = '.'
+LIMIT = '#'
 TREE = 'T'
 BURNING = 'M'
 EMPTY = ' '
@@ -36,6 +40,33 @@ LEARNING_RATE = 1
 DISCOUNT_FACTOR = 0.5
 
 
+class Tile:
+
+    @abstractmethod
+    def endTurnAction(self):
+        pass
+
+
+class Tree(Tile):
+    
+    def endTurnAction(self):
+        return super().endTurnAction()
+
+class BurningTree(Tile):
+
+    burningCount = 3
+
+    @property
+    def burnedToAshes(self) -> bool:
+        return self.burningCount == 0 
+
+    def endTurnAction(self):
+        self.burningCount = self.burningCount - 1
+        return super().endTurnAction()
+    
+
+
+
 class Environment:
     def __init__(self, text) :
 
@@ -47,8 +78,9 @@ class Environment:
             for col in range(len(lines[row])):
                 self.__states[(row, col)] = lines[row][col]
 
-                if(lines[row][col] == GOAL):
-                    self.__goal = (row, col)
+# Définit la condition de victoire dynamiquement
+                # if(lines[row][col] == GOAL):
+                #     self.__goal = (row, col)
 
 
                 if(lines[row][col] == START):
