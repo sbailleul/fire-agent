@@ -17,5 +17,6 @@ if __name__ == '__main__':
             action = agent.best_action()
             # world change
             env.apply(agent, action)
+        env.init_state(FIELD)
         print("Iteration : %d, tours: %d, reward : %d " % (i, j, agent.reward))
         agent.reset(env)

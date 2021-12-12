@@ -3,7 +3,7 @@ from tiles.tile import Tile
 
 
 class Agent:
-    __q_table: dict[tuple[int, int], dict[str, float]]
+    __q_table: dict[Tile, dict[str, float]]
 
     def __init__(self, environment):
         """
@@ -19,7 +19,7 @@ class Agent:
         return self.__last_action
 
     @property
-    def q_table(self) -> dict[tuple[int, int], dict[str, float]]:
+    def q_table(self) -> dict[Tile, dict[str, float]]:
         return self.__q_table
 
     @property
@@ -55,15 +55,16 @@ class Agent:
     # r : Récompense
     # df : Taux de diminution des renforcements
     # maxR : Récompense la plus haute pour une action dans l'état s(t+1)
-    def update_q_table(self, new_action: str, new_state: tuple[int, int], reward: float, learning_rate: float,
+    def update_q_table(self, new_action: str, new_state: Tile, reward: float, learning_rate: float,
                        discount_factor: float):
-        max_reward = max(self.q_table[new_state].values())
+
+        max_reward = max(self.q_table[new_state].values()) if new_state in self.q_table else 0.0
         self.q_table[self.last_state][new_action] = self.q_table[self.last_state][new_action] + learning_rate * (
                 reward + discount_factor * max_reward)
 
     # Sélectionne l'action avec la valeur la plus haute en reward
     def best_action(self):
-        if self.q_table.get(self.last_state) == None:
+        if self.q_table.get(self.last_state) is None:
             self.instantiate_table(self.last_state)
 
         actions = self.q_table.get(self.last_state)
@@ -74,12 +75,10 @@ class Agent:
                 best_action = action
         return best_action
 
-
     def instantiate_table(self, state: Tile):
-        self.__q_table[state] =
+        self.__q_table[state] = {a: 0.0 for a in ACTIONS}
 
-
-    def update(self, state: tuple[int, int], reward: float, action: str, learning_rate: float, discount_factor: float):
+    def update(self, state: Tile, reward: float, action: str, learning_rate: float, discount_factor: float):
         self.update_q_table(action, state, reward, learning_rate, discount_factor)
         self.last_action = action
         self.last_state = state

@@ -16,7 +16,6 @@ REWARD_DEAD_TREE = -5
 REWARD_OUT = -10
 
 
-# GOAL = '*'
 START = '.'
 TREE = 'T'
 BURNING_TREE = 'M'
@@ -42,3 +41,21 @@ DISCOUNT_FACTOR = 0.5
 # Dans un environnement déterministe tel que le labyrinthe la valeur vaut 1,
 # si environnement stochastique alors la valeur vaut 0 < 1
 LEARNING_RATE = 0.5
+
+BURN_PROBABILITY = 0.1
+EXPIRE_PROBABILITY = 0.1
+
+
+
+SPRITE_SCALING = 0.5
+# This sets the WIDTH and HEIGHT of each grid location
+WIDTH = 30
+HEIGHT = 30
+
+# This sets the margin between each cell
+# and on the edges of the screen.
+MARGIN = 5
+# Do the math to figure out our screen dimensions
+
+
+

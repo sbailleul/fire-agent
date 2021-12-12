@@ -7,18 +7,25 @@ from tiles.tile import Tile
 class Environment:
     def __init__(self, maze: str):
         self.__tiles = {}
+        self.previous_living_trees = 0
+        self.__start = None
+        self.columns_count = 0
+        self.rows_count = 0
+        self.init_state(maze)
+
+    def init_state(self, maze):
         lines = maze.strip().split('\n')
         lines = list(map(lambda x: x.strip(), lines))
-        for row in range(len(lines)):
-            for col in range(len(lines[row])):
-                added_tile = TileFactory.getTile((row, col), lines[row][col])
-                self.__tiles[(row, col)] = added_tile
+        self.columns_count = len(lines[0]) - 2
+        self.rows_count = len(lines) - 2
+        for row in range(1, len(lines) - 1):
+            for col in range(1, len(lines[row]) - 1):
+                added_tile = TileFactory.getTile((row - 1, col - 1), lines[row][col])
+                self.__tiles[(row - 1, col - 1)] = added_tile
                 if lines[row][col] == START:
                     self.__start = added_tile
-
         for tile in self.__tiles.values():
             tile.set_neighbors(self.__tiles)
-
         self.previous_living_trees = self.get_living_trees()
 
     @property
@@ -50,29 +57,32 @@ class Environment:
 
     def apply(self, agent: Agent, action: str):
         state = self.calculate_state(action, agent)
-        reward = self.calculate_reward(state)
+        (is_out, reward) = self.calculate_reward(state)
 
+        for tile in self.tiles.values():
+            tile.on_new_turn()
+        for tile in self.tiles.values():
+            tile.apply_next_type()
         # Dans le cas d'une sortie de la grille du labyrinthe le nouvelle état est équivalent à l'ancien état avant sortie
-        agent.update(agent.last_state if reward == REWARD_OUT else state, reward, action, LEARNING_RATE,
+        agent.update(agent.last_state if is_out else state, reward, action, LEARNING_RATE,
                      DISCOUNT_FACTOR)
+
 
     @staticmethod
     def calculate_state(action, agent) -> Tile:
         state = agent.last_state
-        return state.on_action(action)
+        state.on_action(action)
 
-
-
-    def calculate_reward(self, state: Tile) -> float:
-        destroyed_trees_this_turn = self.previous_living_trees - self.get_living_trees()
+    def calculate_reward(self, state: Tile) -> (bool, float):
         reward = 0
-
         if state not in self.tiles:
-            reward = REWARD_OUT
+            return True, REWARD_OUT + self.calculate_dead_trees_reward()
         tile = self.tiles[state.position]
         if tile.type is EMPTY:
             reward = REWARD_FLOOR
-        if tile.type is WALL:
-            reward = REWARD_BOUNCE
 
-        return reward + (destroyed_trees_this_turn * REWARD_DEAD_TREE)
+        return False, reward + self.calculate_dead_trees_reward()
+
+    def calculate_dead_trees_reward(self) -> int:
+        destroyed_trees_this_turn = self.previous_living_trees - self.get_living_trees()
+        return destroyed_trees_this_turn * REWARD_DEAD_TREE
