@@ -15,13 +15,15 @@ REWARD_FLOOR = -1
 REWARD_DEAD_TREE = -5
 REWARD_OUT = -10
 
-
 START = '.'
 TREE = 'T'
 BURNING_TREE = 'M'
 WALL = '#'
 EMPTY = ' '
 
+
+TILE_TYPE_SPRITE_DIC = {TREE: ":resources:images/topdown_tanks/treeGreen_small.png",
+                        BURNING_TREE: ":resources:images/topdown_tanks/treeBrown_small.png"}
 
 # Actions
 UP = 'U'
@@ -45,8 +47,6 @@ LEARNING_RATE = 0.5
 BURN_PROBABILITY = 0.1
 EXPIRE_PROBABILITY = 0.1
 
-
-
 SPRITE_SCALING = 0.5
 # This sets the WIDTH and HEIGHT of each grid location
 WIDTH = 30
@@ -56,6 +56,3 @@ HEIGHT = 30
 # and on the edges of the screen.
 MARGIN = 5
 # Do the math to figure out our screen dimensions
-
-
-
