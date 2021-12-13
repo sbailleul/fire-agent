@@ -38,10 +38,10 @@ class FireAgentGame(arcade.Window):
         """
         self.env = Environment(FIELD)
         self.agent = self.env.create_agent()
-        screen_width = (WIDTH + MARGIN) * self.env.columns_count + MARGIN
-        screen_height = (HEIGHT + MARGIN) * self.env.rows_count + MARGIN
+        self.screen_width = (WIDTH + MARGIN) * self.env.columns_count + MARGIN
+        self.screen_height = (HEIGHT + MARGIN) * self.env.rows_count + MARGIN
         self.loop_cnt = 0
-        super().__init__(screen_width, screen_height, "Array Backed Grid Buffered Example")
+        super().__init__(self.screen_width, self.screen_height, "Array Backed Grid Buffered Example")
         self.sprite_list = None
         self.update_time_cnt = 0
         arcade.set_background_color(arcade.color.BLACK)
@@ -56,8 +56,8 @@ class FireAgentGame(arcade.Window):
 
     def add_tile(self, tile: Tile, sprite_path: str):
         tile_sprite = arcade.Sprite(sprite_path, SPRITE_SCALING)
-        tile_sprite.center_x = (MARGIN + WIDTH) * tile.position[1] + MARGIN + WIDTH // 2
-        tile_sprite.center_y = (MARGIN + HEIGHT) * tile.position[0] + MARGIN + HEIGHT // 2
+        tile_sprite.center_x = (MARGIN + WIDTH) * tile.position[0] + MARGIN + WIDTH // 2
+        tile_sprite.center_y = self.screen_height - ((MARGIN + HEIGHT) * tile.position[1] + MARGIN + HEIGHT // 2)
         self.sprite_list.append(tile_sprite)
 
     def on_draw(self):
@@ -66,7 +66,7 @@ class FireAgentGame(arcade.Window):
 
     def on_update(self, delta_time: float):
         self.update_time_cnt += delta_time
-        if self.update_time_cnt < 1:
+        if self.update_time_cnt < 0.2:
             return
         self.update_time_cnt = 0
 

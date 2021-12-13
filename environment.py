@@ -22,8 +22,8 @@ class Environment:
         self.rows_count = len(lines) - 2
         for row in range(1, len(lines) - 1):
             for col in range(1, len(lines[row]) - 1):
-                added_tile = TileFactory.getTile((row - 1, col - 1), lines[row][col])
-                self.__tiles[(row - 1, col - 1)] = added_tile
+                added_tile = TileFactory.getTile((col - 1, row - 1), lines[row][col])
+                self.__tiles[(col - 1, row - 1)] = added_tile
                 if lines[row][col] == START:
                     self.__start = added_tile
         for tile in self.__tiles.values():
@@ -78,7 +78,7 @@ class Environment:
 
     def calculate_reward(self, state: Tile) -> (bool, float):
         reward = 0
-        if state not in self.tiles:
+        if state is None or state.position not in self.tiles.keys():
             return True, REWARD_OUT + self.calculate_dead_trees_reward()
         tile = self.tiles[state.position]
         if tile.type is EMPTY:

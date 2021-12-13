@@ -36,13 +36,13 @@ class Tile:
 
     def set_neighbors(self, all_tiles):
         # type: (dict[tuple[int, int], Tile])-> Tile
-        self.south = all_tiles.get((self.position[0] + 1, self.position[1]))
-        self.north = all_tiles.get((self.position[0] - 1, self.position[1]))
-        self.east = all_tiles.get((self.position[0], self.position[1] + 1))
-        self.west = all_tiles.get((self.position[0], self.position[1] - 1))
+        self.south = all_tiles.get((self.position[0], self.position[1] + 1))
+        self.north = all_tiles.get((self.position[0], self.position[1] - 1))
+        self.east = all_tiles.get((self.position[0] + 1, self.position[1]))
+        self.west = all_tiles.get((self.position[0] - 1, self.position[1]))
         self.north_west = all_tiles.get((self.position[0] - 1, self.position[1] - 1))
-        self.south_west = all_tiles.get((self.position[0] + 1, self.position[1] - 1))
-        self.north_east = all_tiles.get((self.position[0] - 1, self.position[1] + 1))
+        self.south_west = all_tiles.get((self.position[0] - 1, self.position[1] + 1))
+        self.north_east = all_tiles.get((self.position[0] + 1, self.position[1] - 1))
         self.south_east = all_tiles.get((self.position[0] + 1, self.position[1] + 1))
         self.set_existing_neigbors()
 
