@@ -21,11 +21,11 @@ BURNING_TREE = 'M'
 WALL = '#'
 EMPTY = ' '
 
-
 TILE_TYPE_SPRITE_DIC = {TREE: ":resources:images/topdown_tanks/treeGreen_small.png",
                         BURNING_TREE: ":resources:images/topdown_tanks/treeBrown_small.png",
                         EMPTY: ":resources:images/topdown_tanks/tileGrass2.png"
                         }
+
 AGENT_SPRITE = ":resources:images/animated_characters/robot/robot_idle.png"
 # Actions
 UP = 'U'
@@ -35,6 +35,11 @@ RIGHT = 'R'
 
 WATER = 'W'
 CUT_TREE = 'C'
+
+ACTION_TYPE_SPRITE_DIC = {
+    CUT_TREE: ":resources:images/tiles/sandCenter.png",
+    WATER: ":resources:images/tiles/water.png"
+}
 
 ACTIONS = [UP, DOWN, LEFT, RIGHT, WATER, CUT_TREE]
 

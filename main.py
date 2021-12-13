@@ -10,7 +10,8 @@ python -m arcade.examples.array_backed_grid_buffered
 import arcade
 
 # Set how many rows and columns we will have
-from constants import FIELD, SPRITE_SCALING, MARGIN, WIDTH, HEIGHT, TILE_TYPE_SPRITE_DIC, AGENT_SPRITE
+from constants import FIELD, SPRITE_SCALING, MARGIN, WIDTH, HEIGHT, TILE_TYPE_SPRITE_DIC, AGENT_SPRITE, \
+    ACTION_TYPE_SPRITE_DIC
 from environment import Environment
 from tiles.tile import Tile
 
@@ -19,18 +20,6 @@ class FireAgentGame(arcade.Window):
     """
     Main application class.
     """
-
-    # def loop(self):
-    #     for i in range(100):
-    #         j = 0
-    #         while self.env.get_burning_trees() != 0:
-    #             j += 1
-    #             action = self.agent.best_action()
-    #             # world change
-    #             self.env.apply(self.agent, action)
-    #         self.env.init_state(FIELD)
-    #         print("Iteration : %d, tours: %d, reward : %d " % (i, j, self.agent.reward))
-    #         self.agent.reset(self.env)
 
     def __init__(self):
         """
@@ -52,10 +41,14 @@ class FireAgentGame(arcade.Window):
         for tile in self.env.tiles.values():
             sprite_path = TILE_TYPE_SPRITE_DIC.get(tile.type)
             self.add_tile(tile, sprite_path)
+        if self.agent.last_action in ACTION_TYPE_SPRITE_DIC:
+            self.add_tile(self.agent.last_state, ACTION_TYPE_SPRITE_DIC.get(self.agent.last_action))
         self.add_tile(self.agent.last_state, AGENT_SPRITE)
 
     def add_tile(self, tile: Tile, sprite_path: str):
         tile_sprite = arcade.Sprite(sprite_path, SPRITE_SCALING)
+        tile_sprite.width = WIDTH
+        tile_sprite.height = HEIGHT
         tile_sprite.center_x = (MARGIN + WIDTH) * tile.position[0] + MARGIN + WIDTH // 2
         tile_sprite.center_y = self.screen_height - ((MARGIN + HEIGHT) * tile.position[1] + MARGIN + HEIGHT // 2)
         self.sprite_list.append(tile_sprite)
