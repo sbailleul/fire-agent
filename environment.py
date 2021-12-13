@@ -22,7 +22,7 @@ class Environment:
         self.rows_count = len(lines) - 2
         for row in range(1, len(lines) - 1):
             for col in range(1, len(lines[row]) - 1):
-                added_tile = TileFactory.getTile((row - 1, col - 1), lines[row][col])
+                added_tile = TileFactory.getTile((self.rows_count - (row - 1) - 1, col - 1), lines[row][col])
                 self.__tiles[(row - 1, col - 1)] = added_tile
                 if lines[row][col] == START:
                     self.__start = added_tile
