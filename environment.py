@@ -1,3 +1,5 @@
+from copy import copy
+
 from constants import *
 from agent import Agent
 from tiles.factory import TileFactory
@@ -56,21 +58,22 @@ class Environment:
         return counter
 
     def apply(self, agent: Agent, action: str):
-        state = self.calculate_state(action, agent)
-        (is_out, reward) = self.calculate_reward(state)
+        new_state = agent.last_state
+        agent.last_state = copy(agent.last_state)
+        new_state = self.calculate_state(action, new_state)
+        (is_out, reward) = self.calculate_reward(new_state)
 
         for tile in self.tiles.values():
             tile.on_new_turn()
         for tile in self.tiles.values():
             tile.apply_next_type()
         # Dans le cas d'une sortie de la grille du labyrinthe le nouvelle état est équivalent à l'ancien état avant sortie
-        agent.update(agent.last_state if is_out else state, reward, action, LEARNING_RATE,
+        agent.update(agent.last_state if is_out else new_state, reward, action, LEARNING_RATE,
                      DISCOUNT_FACTOR)
 
 
     @staticmethod
-    def calculate_state(action, agent) -> Tile:
-        state = agent.last_state
+    def calculate_state(action, state) -> Tile:
         return state.on_action(action)
 
     def calculate_reward(self, state: Tile) -> (bool, float):

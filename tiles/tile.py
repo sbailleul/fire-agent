@@ -68,6 +68,8 @@ class Tile:
         if BURNING_TREE in self.get_neighbors_types():
             if random_value < constants.BURN_PROBABILITY:
                 self.next_type = BURNING_TREE
+            else :
+                self.next_type = self.type
 
     def apply_next_type(self):
         self.type = self.next_type

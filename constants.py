@@ -24,7 +24,7 @@ EMPTY = ' '
 
 TILE_TYPE_SPRITE_DIC = {TREE: ":resources:images/topdown_tanks/treeGreen_small.png",
                         BURNING_TREE: ":resources:images/topdown_tanks/treeBrown_small.png"}
-
+AGENT_SPRITE = ":resources:images/animated_characters/robot/robot_idle.png"
 # Actions
 UP = 'U'
 DOWN = 'D'
