@@ -59,13 +59,13 @@ class Agent:
                        discount_factor: float):
 
         max_reward = max(self.q_table[new_state].values()) if new_state in self.q_table else 0.0
+        self.set_state_if_not_exist(self.last_state)
         self.q_table[self.last_state][new_action] = self.q_table[self.last_state][new_action] + learning_rate * (
                 reward + discount_factor * max_reward)
 
     # Sélectionne l'action avec la valeur la plus haute en reward
     def best_action(self):
-        if self.q_table.get(self.last_state) is None:
-            self.instantiate_table(self.last_state)
+        self.set_state_if_not_exist(self.last_state)
 
         actions = self.q_table.get(self.last_state)
 
@@ -75,8 +75,9 @@ class Agent:
                 best_action = action
         return best_action
 
-    def instantiate_table(self, state: Tile):
-        self.__q_table[state] = {a: 0.0 for a in ACTIONS}
+    def set_state_if_not_exist(self, state: Tile):
+        if state not in self.q_table:
+            self.__q_table[state] = {a: 0.0 for a in ACTIONS}
 
     def update(self, state: Tile, reward: float, action: str, learning_rate: float, discount_factor: float):
         self.update_q_table(action, state, reward, learning_rate, discount_factor)

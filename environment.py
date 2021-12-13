@@ -71,7 +71,7 @@ class Environment:
     @staticmethod
     def calculate_state(action, agent) -> Tile:
         state = agent.last_state
-        state.on_action(action)
+        return state.on_action(action)
 
     def calculate_reward(self, state: Tile) -> (bool, float):
         reward = 0

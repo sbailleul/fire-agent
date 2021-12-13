@@ -6,6 +6,20 @@ from constants import *
 
 class Tile:
 
+    def __copy__(self):
+        tile = Tile(self.position, tile_type=self.type)
+        tile.north = self.north
+        tile.south = self.south
+        tile.east = self.east
+        tile.west = self.west
+        tile.position = self.position
+        tile.north_east = self.north_east
+        tile.north_west = self.north_west
+        tile.south_west = self.south_west
+        tile.south_east = self.south_east
+        tile.set_existing_neigbors()
+        return tile
+
     def __init__(self, position: tuple[int, int], tile_type: str):
         self.position = position
         self.type = tile_type
@@ -17,7 +31,7 @@ class Tile:
         self.south_west = None  # type: Tile | None
         self.north_east = None  # type: Tile | None
         self.south_east = None  # type: Tile | None
-        self.neighbors = []
+        self.existing_neighbors = []
         self.next_type = None
 
     def set_neighbors(self, all_tiles):
@@ -30,8 +44,18 @@ class Tile:
         self.south_west = all_tiles.get((self.position[0] + 1, self.position[1] - 1))
         self.north_east = all_tiles.get((self.position[0] - 1, self.position[1] + 1))
         self.south_east = all_tiles.get((self.position[0] + 1, self.position[1] + 1))
-        self.neighbors = [self.south, self.north, self.west, self.east, self.south_east, self.south_west,
-                          self.north_east, self.north_west]
+        self.set_existing_neigbors()
+
+    def set_existing_neigbors(self):
+        self.existing_neighbors = [neighbor for neighbor in
+                                   [self.south, self.north, self.west, self.east, self.south_east, self.south_west,
+                                    self.north_east, self.north_west] if neighbor]
+
+    def get_neighbors_types(self) -> list[str]:
+        return [neighbor.type for neighbor in self.existing_neighbors]
+
+    def get_neigbors_hashes(self) -> list[int]:
+        return [hash((neighbor.position, neighbor.type)) for neighbor in self.existing_neighbors]
 
     def on_new_turn(self):
         random_value = random.random()
@@ -41,7 +65,7 @@ class Tile:
         if self.type == BURNING_TREE and random_value < constants.EXPIRE_PROBABILITY:
             self.next_type = EMPTY
             return
-        if BURNING_TREE in [neighbor.type if neighbor is not None else None for neighbor in self.neighbors]:
+        if BURNING_TREE in self.get_neighbors_types():
             if random_value < constants.BURN_PROBABILITY:
                 self.next_type = BURNING_TREE
 
@@ -65,7 +89,7 @@ class Tile:
         return self
 
     def __hash__(self):
-        return hash((self.position, self.type))
+        return hash((self.position, self.type, *self.get_neigbors_hashes()))
 
     def __eq__(self, other):
-        return (self.position, self.type) == (other.position, other.type)
+        return self.__hash__() == other.__hash__()
