@@ -1,3 +1,4 @@
+from __future__ import annotations
 import random
 
 import constants
@@ -5,6 +6,18 @@ from constants import *
 
 
 class Tile:
+    south: Tile | None
+    north: Tile | None
+    east: Tile | None
+    west: Tile | None
+    north_west: Tile | None
+    south_west: Tile | None
+    north_east: Tile | None
+    south_east: Tile | None
+    existing_neighbors: list[Tile]
+    next_type: str | None
+    position: tuple[int, int]
+    type: str
 
     def __copy__(self):
         tile = Tile(self.position, tile_type=self.type)
@@ -23,19 +36,18 @@ class Tile:
     def __init__(self, position: tuple[int, int], tile_type: str):
         self.position = position
         self.type = tile_type
-        self.south = None  # type: Tile | None
-        self.north = None  # type: Tile | None
-        self.east = None  # type: Tile | None
-        self.west = None  # type: Tile | None
-        self.north_west = None  # type: Tile | None
-        self.south_west = None  # type: Tile | None
-        self.north_east = None  # type: Tile | None
-        self.south_east = None  # type: Tile | None
+        self.south = None
+        self.north = None
+        self.east = None
+        self.west = None
+        self.north_west = None
+        self.south_west = None
+        self.north_east = None
+        self.south_east = None
         self.existing_neighbors = []
         self.next_type = None
 
-    def set_neighbors(self, all_tiles):
-        # type: (dict[tuple[int, int], Tile])-> Tile
+    def set_neighbors(self, all_tiles: dict[tuple[int, int], Tile]):
         self.south = all_tiles.get((self.position[0], self.position[1] + 1))
         self.north = all_tiles.get((self.position[0], self.position[1] - 1))
         self.east = all_tiles.get((self.position[0] + 1, self.position[1]))
@@ -46,13 +58,24 @@ class Tile:
         self.south_east = all_tiles.get((self.position[0] + 1, self.position[1] + 1))
         self.set_existing_neigbors()
 
+    @property
+    def neighbors(self) -> list[Tile | None]:
+        return [self.south, self.north, self.west, self.east, self.south_east, self.south_west,
+                self.north_east, self.north_west]
+
     def set_existing_neigbors(self):
-        self.existing_neighbors = [neighbor for neighbor in
-                                   [self.south, self.north, self.west, self.east, self.south_east, self.south_west,
-                                    self.north_east, self.north_west] if neighbor]
+        self.existing_neighbors = [neighbor for neighbor in self.neighbors if neighbor]
 
     def get_neighbors_types(self) -> list[str]:
         return [neighbor.type for neighbor in self.existing_neighbors]
+
+    def resume(self):
+        resumes: list[tuple[tuple[int, int], str] | None] = [(self.position, self.type)]
+        for neighbor in self.neighbors:
+            if neighbor is not None:
+                resumes.append((neighbor.position, neighbor.type))
+            else:
+                resumes.append(None)
 
     def get_neigbors_hashes(self) -> list[int]:
         return [hash((neighbor.position, neighbor.type)) for neighbor in self.existing_neighbors]
@@ -90,9 +113,3 @@ class Tile:
         if action == CUT_TREE and self.type in [TREE, BURNING_TREE]:
             self.type = EMPTY
         return self
-
-    def __hash__(self):
-        return hash((self.position, self.type, *self.get_neigbors_hashes()))
-
-    def __eq__(self, other):
-        return self.__hash__() == other.__hash__()

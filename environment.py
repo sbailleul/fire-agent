@@ -7,6 +7,8 @@ from tiles.tile import Tile
 
 
 class Environment:
+    __start: Tile
+
     def __init__(self, maze: str):
         self.__tiles = {}
         self.previous_living_trees = 0
@@ -70,7 +72,6 @@ class Environment:
         # Dans le cas d'une sortie de la grille du labyrinthe le nouvelle état est équivalent à l'ancien état avant sortie
         agent.update(agent.last_state if is_out else new_state, reward, action, LEARNING_RATE,
                      DISCOUNT_FACTOR)
-
 
     @staticmethod
     def calculate_state(action, state) -> Tile:
