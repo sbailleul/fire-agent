@@ -49,14 +49,14 @@ class Tile:
         self.next_type = None
 
     def set_neighbors(self, all_tiles: dict[tuple[int, int], Tile]):
-        self.south = all_tiles.get((self.position[0], self.position[1] + 1))
-        self.north = all_tiles.get((self.position[0], self.position[1] - 1))
-        self.east = all_tiles.get((self.position[0] + 1, self.position[1]))
-        self.west = all_tiles.get((self.position[0] - 1, self.position[1]))
-        self.north_west = all_tiles.get((self.position[0] - 1, self.position[1] - 1))
-        self.south_west = all_tiles.get((self.position[0] - 1, self.position[1] + 1))
-        self.north_east = all_tiles.get((self.position[0] + 1, self.position[1] - 1))
-        self.south_east = all_tiles.get((self.position[0] + 1, self.position[1] + 1))
+        self.south = all_tiles.get((self.position[X], self.position[Y] + 1))
+        self.north = all_tiles.get((self.position[X], self.position[Y] - 1))
+        self.east = all_tiles.get((self.position[X] + 1, self.position[Y]))
+        self.west = all_tiles.get((self.position[X] - 1, self.position[Y]))
+        self.north_west = all_tiles.get((self.position[X] - 1, self.position[Y] - 1))
+        self.south_west = all_tiles.get((self.position[X] - 1, self.position[Y] + 1))
+        self.north_east = all_tiles.get((self.position[X] + 1, self.position[Y] - 1))
+        self.south_east = all_tiles.get((self.position[X] + 1, self.position[Y] + 1))
         self.set_existing_neigbors()
 
     @property
@@ -72,16 +72,13 @@ class Tile:
 
     @property
     def to_vector(self) -> list[int]:
-        resumes = [self.position[0], self.position[1], STATES.index(self.type)]
+        resumes = [self.position[X], self.position[Y], STATES.index(self.type)]
         for neighbor in self.neighbors:
             if neighbor is not None:
                 resumes.append(STATES.index(neighbor.type))
             else:
                 resumes.append(0)
         return resumes
-
-    def get_neigbors_hashes(self) -> list[int]:
-        return [hash((neighbor.position, neighbor.type)) for neighbor in self.existing_neighbors]
 
     def on_new_turn(self):
         random_value = random.random()

@@ -1,8 +1,9 @@
-import matplotlib.pyplot as plt
-from random import *
-import arcade
-import pickle
 import os
+import pickle
+from random import *
+
+import arcade
+import matplotlib.pyplot as plt
 from sklearn.neural_network import MLPRegressor
 
 SPRITE_SIZE = 64

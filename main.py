@@ -8,13 +8,12 @@ If Python and Arcade are installed, this example can be run from the command lin
 python -m arcade.examples.array_backed_grid_buffered
 """
 import arcade
-
 # Set how many rows and columns we will have
 from matplotlib import pyplot as plt
 
 from agent import Agent
 from constants import FIELD, SPRITE_SCALING, MARGIN, WIDTH, HEIGHT, TILE_TYPE_SPRITE_DIC, AGENT_SPRITE, \
-    ACTION_TYPE_SPRITE_DIC, AGENT_FILENAME
+    ACTION_TYPE_SPRITE_DIC, AGENT_FILENAME, Y, X
 from environment import Environment
 from tiles.tile import Tile
 
@@ -53,8 +52,8 @@ class FireAgentGame(arcade.Window):
         tile_sprite = arcade.Sprite(sprite_path, SPRITE_SCALING)
         tile_sprite.width = WIDTH
         tile_sprite.height = HEIGHT
-        tile_sprite.center_x = (MARGIN + WIDTH) * tile.position[0] + MARGIN + WIDTH // 2
-        tile_sprite.center_y = self.screen_height - ((MARGIN + HEIGHT) * tile.position[1] + MARGIN + HEIGHT // 2)
+        tile_sprite.center_x = (MARGIN + WIDTH) * tile.position[X] + MARGIN + WIDTH // 2
+        tile_sprite.center_y = self.screen_height - ((MARGIN + HEIGHT) * tile.position[Y] + MARGIN + HEIGHT // 2)
         self.sprite_list.append(tile_sprite)
 
     def on_draw(self):
@@ -74,7 +73,7 @@ class FireAgentGame(arcade.Window):
             self.sprite_list.draw()
             return
 
-        if self.iteration < 10:
+        if self.iteration < 1000:
             self.env.init_state(FIELD)
             self.agent.update_history()
             self.agent.reset(self.env)
@@ -87,6 +86,7 @@ def main():
     game.agent.save(AGENT_FILENAME)
     plt.plot(game.agent.history)
     plt.show()
+
 
 if __name__ == "__main__":
     main()

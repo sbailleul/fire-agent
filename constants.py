@@ -8,12 +8,15 @@ FIELD = """
     ###########
     """
 
+X = 0
+Y = 1
+
 # Rewards
-# REWARD_TREE_WATERED = 10
 REWARD_BOUNCE = -2
 REWARD_FLOOR = -1
 REWARD_DEAD_TREE = -5
 REWARD_OUT = -10
+REWARD_BURNING_TREE_DIST = -1
 
 START = '.'
 TREE = 'T'
@@ -53,8 +56,8 @@ DISCOUNT_FACTOR = 0.5
 # si environnement stochastique alors la valeur vaut 0 < 1
 LEARNING_RATE = 0.5
 EXPLORATION = 1.0
-BURN_PROBABILITY = 0.1
-EXPIRE_PROBABILITY = 0.1
+BURN_PROBABILITY = 0.01
+EXPIRE_PROBABILITY = 0.01
 
 SPRITE_SCALING = 0.5
 # This sets the WIDTH and HEIGHT of each grid location

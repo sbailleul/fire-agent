@@ -3,14 +3,13 @@ from random import random, choice
 
 from sklearn.neural_network import MLPRegressor
 
-from constants import ACTIONS, STATES, EXPLORATION
+from constants import ACTIONS, STATES, EXPLORATION, X, Y
 from tiles.tile import Tile
 
 
 class Agent:
     __reward: float
     __last_action: str
-    # __q_table: dict[list[tuple[tuple[int, int], str]], dict[str, float]]
     __last_state: Tile
     __exploration: float
     __mlp: MLPRegressor
@@ -34,16 +33,11 @@ class Agent:
                                   max_iter=1,
                                   warm_start=True,
                                   learning_rate_init=self.__learning_rate)
-        self.__mlp.fit([[0] * 11], [[0] * len(ACTIONS)])
-        self.__q_table = {}
+        self.__mlp.fit([[0] * 13], [[0] * len(ACTIONS)])
 
     @property
     def last_action(self) -> str:
         return self.__last_action
-
-    @property
-    def q_table(self) -> dict[list[tuple[tuple[int, int], str]], dict[str, float]]:
-        return self.__q_table
 
     @property
     def mlp(self) -> MLPRegressor:
@@ -73,19 +67,23 @@ class Agent:
     def history(self):
         return self.__history
 
-    def to_pondered_vector(self, state: list[int]) -> list[float]:
-        current_position = [state[0] / self.__environment.columns_count, state[1] / self.__environment.rows_count]
-        all_types = [state[i] / len(STATES) for i in range(2, len(state))]
-        return current_position + all_types
+    def to_pondered_vector(self, state: Tile) -> list[float]:
+        vector_state = state.to_vector
+        current_position = [vector_state[X] / self.__environment.columns_count,
+                            vector_state[Y] / self.__environment.rows_count]
+        all_types = [vector_state[i] / len(STATES) for i in range(2, len(vector_state))]
+        radar = self.__environment.get_fire_direction_from_tile(state)
+        return current_position + all_types + [radar[X] / self.__environment.columns_count,
+                                               radar[Y] / self.__environment.rows_count]
 
     def update_neural(self, new_action: str, new_state: Tile, reward: float):
-        maxQ = max(self.__mlp.predict([self.to_pondered_vector(new_state.to_vector)])[0])
+        maxQ = max(self.__mlp.predict([self.to_pondered_vector(new_state)])[0])
         desired = reward + self.__discount_factor * maxQ
-        last_state_vector = [self.to_pondered_vector(self.last_state.to_vector)]
-        qvector = self.__mlp.predict(last_state_vector)[0]
+        last_state_vector = [self.to_pondered_vector(self.last_state)]
+        q_vector = self.__mlp.predict(last_state_vector)[0]
         i_action = ACTIONS.index(new_action)
-        qvector[i_action] = desired
-        self.__mlp.fit(last_state_vector, [qvector])
+        q_vector[i_action] = desired
+        self.__mlp.fit(last_state_vector, [q_vector])
 
     # Sélectionne l'action avec la valeur la plus haute en reward
     def best_action(self):
@@ -94,17 +92,13 @@ class Agent:
             return choice(ACTIONS)
 
         else:
-            last_state_vector = [self.to_pondered_vector(self.last_state.to_vector)]
-            qvector = self.__mlp.predict(last_state_vector)[0]
+            last_state_vector = [self.to_pondered_vector(self.last_state)]
+            q_vector = self.__mlp.predict(last_state_vector)[0]
             i_best = 0
-            for i in range(len(qvector)):
-                if qvector[i] > qvector[i_best]:
+            for i in range(len(q_vector)):
+                if q_vector[i] > q_vector[i_best]:
                     i_best = i
             return ACTIONS[i_best]
-
-    def set_state_if_not_exist(self, state: list[tuple[tuple[int, int], str]]):
-        if state not in self.q_table:
-            self.__q_table[state] = {a: 0.0 for a in ACTIONS}
 
     def update(self, state: Tile, reward: float, action: str):
         self.update_neural(action, state, reward)
