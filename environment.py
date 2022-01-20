@@ -1,13 +1,15 @@
 from copy import copy
 
-from constants import *
 from agent import Agent
+from constants import *
 from tiles.factory import TileFactory
 from tiles.tile import Tile
 
 
 class Environment:
     __start: Tile
+    columns_count: int
+    rows_count: int
 
     def __init__(self, maze: str):
         self.__tiles = {}
@@ -16,6 +18,8 @@ class Environment:
         self.columns_count = 0
         self.rows_count = 0
         self.init_state(maze)
+        self.learning_rate = LEARNING_RATE
+        self.discount_factor = DISCOUNT_FACTOR
 
     def init_state(self, maze):
         lines = maze.strip().split('\n')
@@ -70,8 +74,7 @@ class Environment:
         for tile in self.tiles.values():
             tile.apply_next_type()
         # Dans le cas d'une sortie de la grille du labyrinthe le nouvelle état est équivalent à l'ancien état avant sortie
-        agent.update(agent.last_state if is_out else new_state, reward, action, LEARNING_RATE,
-                     DISCOUNT_FACTOR)
+        agent.update(agent.last_state if is_out else new_state, reward, action)
 
     @staticmethod
     def calculate_state(action, state) -> Tile:

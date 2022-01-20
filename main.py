@@ -10,8 +10,11 @@ python -m arcade.examples.array_backed_grid_buffered
 import arcade
 
 # Set how many rows and columns we will have
+from matplotlib import pyplot as plt
+
+from agent import Agent
 from constants import FIELD, SPRITE_SCALING, MARGIN, WIDTH, HEIGHT, TILE_TYPE_SPRITE_DIC, AGENT_SPRITE, \
-    ACTION_TYPE_SPRITE_DIC
+    ACTION_TYPE_SPRITE_DIC, AGENT_FILENAME
 from environment import Environment
 from tiles.tile import Tile
 
@@ -20,6 +23,7 @@ class FireAgentGame(arcade.Window):
     """
     Main application class.
     """
+    agent: Agent
 
     def __init__(self):
         """
@@ -29,7 +33,7 @@ class FireAgentGame(arcade.Window):
         self.agent = self.env.create_agent()
         self.screen_width = (WIDTH + MARGIN) * self.env.columns_count + MARGIN
         self.screen_height = (HEIGHT + MARGIN) * self.env.rows_count + MARGIN
-        self.loop_cnt = 0
+        self.iteration = 0
         super().__init__(self.screen_width, self.screen_height, "Array Backed Grid Buffered Example")
         self.sprite_list = None
         self.update_time_cnt = 0
@@ -59,9 +63,9 @@ class FireAgentGame(arcade.Window):
 
     def on_update(self, delta_time: float):
         self.update_time_cnt += delta_time
-        if self.update_time_cnt < 0.2:
-            return
-        self.update_time_cnt = 0
+        # if self.update_time_cnt < 0.2:
+        #     return
+        # self.update_time_cnt = 0
 
         if self.env.get_burning_trees():
             action = self.agent.best_action()
@@ -70,16 +74,19 @@ class FireAgentGame(arcade.Window):
             self.sprite_list.draw()
             return
 
-        if self.loop_cnt < 100:
+        if self.iteration < 10:
             self.env.init_state(FIELD)
+            self.agent.update_history()
             self.agent.reset(self.env)
-            self.loop_cnt += 1
+            self.iteration += 1
 
 
 def main():
-    FireAgentGame()
+    game = FireAgentGame()
     arcade.run()
-
+    game.agent.save(AGENT_FILENAME)
+    plt.plot(game.agent.history)
+    plt.show()
 
 if __name__ == "__main__":
     main()

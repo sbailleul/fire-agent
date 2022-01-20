@@ -21,6 +21,8 @@ BURNING_TREE = 'M'
 WALL = '#'
 EMPTY = ' '
 
+STATES = [TREE, BURNING_TREE, EMPTY]
+
 TILE_TYPE_SPRITE_DIC = {TREE: ":resources:images/topdown_tanks/treeGreen_small.png",
                         BURNING_TREE: ":resources:images/topdown_tanks/treeBrown_small.png",
                         EMPTY: ":resources:images/topdown_tanks/tileGrass2.png"
@@ -50,7 +52,7 @@ DISCOUNT_FACTOR = 0.5
 # Dans un environnement déterministe tel que le labyrinthe la valeur vaut 1,
 # si environnement stochastique alors la valeur vaut 0 < 1
 LEARNING_RATE = 0.5
-
+EXPLORATION = 1.0
 BURN_PROBABILITY = 0.1
 EXPIRE_PROBABILITY = 0.1
 
@@ -63,3 +65,6 @@ HEIGHT = 30
 # and on the edges of the screen.
 MARGIN = 5
 # Do the math to figure out our screen dimensions
+
+
+AGENT_FILENAME = 'agent.dat'

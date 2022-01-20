@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 import random
 
 import constants
@@ -69,13 +70,15 @@ class Tile:
     def get_neighbors_types(self) -> list[str]:
         return [neighbor.type for neighbor in self.existing_neighbors]
 
-    def resume(self):
-        resumes: list[tuple[tuple[int, int], str] | None] = [(self.position, self.type)]
+    @property
+    def to_vector(self) -> list[int]:
+        resumes = [self.position[0], self.position[1], STATES.index(self.type)]
         for neighbor in self.neighbors:
             if neighbor is not None:
-                resumes.append((neighbor.position, neighbor.type))
+                resumes.append(STATES.index(neighbor.type))
             else:
-                resumes.append(None)
+                resumes.append(0)
+        return resumes
 
     def get_neigbors_hashes(self) -> list[int]:
         return [hash((neighbor.position, neighbor.type)) for neighbor in self.existing_neighbors]
