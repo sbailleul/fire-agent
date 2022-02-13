@@ -24,12 +24,16 @@ class FireAgentGame(arcade.Window):
     """
     agent: Agent
 
-    def __init__(self):
+    def __init__(self, max_iterations, is_restore=False):
         """
         Set up the application.
         """
+        self.max_iterations = max_iterations
         self.env = Environment(FIELD)
-        self.agent = self.env.create_agent()
+        if is_restore:
+            self.agent = self.env.create_agent(AGENT_FILENAME)
+        else:
+            self.agent = self.env.create_agent()
         self.screen_width = (WIDTH + MARGIN) * self.env.columns_count + MARGIN
         self.screen_height = (HEIGHT + MARGIN) * self.env.rows_count + MARGIN
         self.iteration = 0
@@ -62,10 +66,6 @@ class FireAgentGame(arcade.Window):
 
     def on_update(self, delta_time: float):
         self.update_time_cnt += delta_time
-        # if self.update_time_cnt < 0.2:
-        #     return
-        # self.update_time_cnt = 0
-
         if self.env.get_burning_trees():
             action = self.agent.best_action()
             self.env.apply(self.agent, action)
@@ -73,16 +73,31 @@ class FireAgentGame(arcade.Window):
             self.sprite_list.draw()
             return
 
-        if self.iteration < 1000:
+        if self.iteration < self.max_iterations:
             self.env.init_state(FIELD)
             self.agent.update_history()
             self.agent.reset(self.env)
             self.iteration += 1
 
+    def run_without_ui(self):
+        for i in range(0, self.max_iterations):
+            while self.env.get_burning_trees():
+                action = self.agent.best_action()
+                self.env.apply(self.agent, action)
+
+            # if max(self.agent.history) == self.agent.reward:
+            #     print("MAX REWARD !")
+            print("Iteration : ", i, ", Score : ", self.agent.reward)
+
+            self.env.init_state(FIELD)
+            self.agent.update_history()
+            self.agent.reset(self.env)
+
 
 def main():
-    game = FireAgentGame()
+    game = FireAgentGame(100)
     arcade.run()
+    # game.run_without_ui()
     game.agent.save(AGENT_FILENAME)
     plt.plot(game.agent.history)
     plt.show()

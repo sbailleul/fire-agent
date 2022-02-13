@@ -1,4 +1,3 @@
-import math
 from copy import copy
 
 from agent import Agent
@@ -45,8 +44,8 @@ class Environment:
     def tiles(self) -> dict[tuple[int, int], Tile]:
         return self.__tiles
 
-    def create_agent(self) -> Agent:
-        return Agent(self)
+    def create_agent(self, previous_state_file=None) -> Agent:
+        return Agent(self, previous_state_file)
 
     def get_living_trees(self):
         counter = 0
@@ -111,13 +110,18 @@ class Environment:
         return False, reward + self.calculate_dead_trees_reward() + self.calculate_fire_dist_reward(new_state)
 
     def calculate_fire_dist_reward(self, new_state: Tile) -> float:
-        nearest_burning_tile = self.get_min_fire_tile_dist(new_state)
-        if nearest_burning_tile:
-            dist = self.get_tile_dist(nearest_burning_tile, new_state)
-            reward = REWARD_BURNING_TREE_DIST if dist == 0 else REWARD_BURNING_TREE_DIST / dist
-            return reward
+        # nearest_burning_tile = self.get_min_fire_tile_dist(new_state)
+        # if nearest_burning_tile:
+        #     dist = self.get_tile_dist(nearest_burning_tile, new_state)
+        #     reward = REWARD_BURNING_TREE_DIST if dist == 0 else REWARD_BURNING_TREE_DIST / dist
+        #     return reward
         return 0
 
     def calculate_dead_trees_reward(self) -> int:
         destroyed_trees_this_turn = self.previous_living_trees - self.get_living_trees()
+        if destroyed_trees_this_turn > 0:
+            print("Diff destroyed trees", destroyed_trees_this_turn, "new turn", self.get_living_trees(), "old turn",
+                  self.previous_living_trees)
+        self.previous_living_trees = self.get_living_trees()
+
         return destroyed_trees_this_turn * REWARD_DEAD_TREE

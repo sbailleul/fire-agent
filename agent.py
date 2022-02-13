@@ -15,7 +15,7 @@ class Agent:
     __mlp: MLPRegressor
     __learning_rate: float
 
-    def __init__(self, environment):
+    def __init__(self, environment, previous_state_file=None):
         """
         :type environment: environment.Environment
         """
@@ -27,16 +27,19 @@ class Agent:
         self.__history = []
         self.__last_state = environment.start
         self.__last_action = None
-        self.__mlp = MLPRegressor(hidden_layer_sizes=(10,),
-                                  activation='logistic',
-                                  solver='sgd',
-                                  max_iter=1,
-                                  warm_start=True,
-                                  learning_rate_init=self.__learning_rate)
-        self.__mlp.fit([
-            [0] * (STATE_RADAR_FIRE_TILL + STATE_TILLS_COUNT + STATE_X_Y_POSITION)],
-            [[0] * len(ACTIONS)
-             ])
+        if previous_state_file:
+            self.load(previous_state_file)
+        else:
+            self.__mlp = MLPRegressor(hidden_layer_sizes=(10,),
+                                      activation='relu',
+                                      solver='sgd',
+                                      max_iter=1,
+                                      warm_start=True,
+                                      learning_rate_init=self.__learning_rate)
+            self.__mlp.fit([
+                [0] * (STATE_RADAR_FIRE_TILL + STATE_TILLS_COUNT + STATE_X_Y_POSITION)],
+                [[0] * len(ACTIONS)
+                 ])
 
     @property
     def last_action(self) -> str:
@@ -107,6 +110,7 @@ class Agent:
         self.update_neural(action, state, reward)
         self.last_action = action
         self.last_state = state
+        print("New reward : ", reward)
         self.reward += reward
 
     def reset(self, env):
