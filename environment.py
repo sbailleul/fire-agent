@@ -84,10 +84,10 @@ class Environment:
         return abs(tile.position[X] - check_tile.position[X]) + abs(tile.position[Y] - check_tile.position[Y])
 
     def apply(self, agent: Agent, action: str):
-        new_state = agent.last_state
+        old_state = agent.last_state
         agent.last_state = copy(agent.last_state)
-        new_state = self.calculate_state(action, new_state)
-        (is_out, reward) = self.calculate_reward(new_state)
+        new_state = self.calculate_state(action, old_state)
+        (is_out, reward) = self.calculate_reward(old_state, new_state, action)
 
         for tile in self.tiles.values():
             tile.on_new_turn()
@@ -100,14 +100,22 @@ class Environment:
     def calculate_state(action, state) -> Tile:
         return state.on_action(action)
 
-    def calculate_reward(self, new_state: Tile) -> (bool, float):
+    def calculate_reward(self, old_state: Tile, new_state: Tile, action: str) -> (bool, float):
         reward = 0
+        reward += self.calculate_dumb_reward(old_state, action)
         if new_state is None or new_state.position not in self.tiles.keys():
             return True, REWARD_OUT + self.calculate_dead_trees_reward()
         tile = self.tiles[new_state.position]
         if tile.type is EMPTY:
-            reward = REWARD_FLOOR
+            reward += REWARD_FLOOR
         return False, reward + self.calculate_dead_trees_reward() + self.calculate_fire_dist_reward(new_state)
+
+    def calculate_dumb_reward(self, old_state, action: str):
+        if old_state is None:
+            return 0
+        if (old_state.type == EMPTY and action in [WATER, CUT_TREE]) or (old_state.type == TREE and action == WATER):
+            return -6
+        return 0
 
     def calculate_fire_dist_reward(self, new_state: Tile) -> float:
         # nearest_burning_tile = self.get_min_fire_tile_dist(new_state)
