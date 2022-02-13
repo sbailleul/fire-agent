@@ -1,3 +1,4 @@
+import math
 from copy import copy
 
 from agent import Agent
@@ -111,7 +112,10 @@ class Environment:
 
     def calculate_fire_dist_reward(self, new_state: Tile) -> float:
         nearest_burning_tile = self.get_min_fire_tile_dist(new_state)
-        if nearest_burning_tile: return self.get_tile_dist(nearest_burning_tile, new_state) * REWARD_BURNING_TREE_DIST
+        if nearest_burning_tile:
+            dist = self.get_tile_dist(nearest_burning_tile, new_state)
+            reward = REWARD_BURNING_TREE_DIST if dist == 0 else REWARD_BURNING_TREE_DIST / dist
+            return reward
         return 0
 
     def calculate_dead_trees_reward(self) -> int:

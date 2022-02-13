@@ -3,7 +3,7 @@ from random import random, choice
 
 from sklearn.neural_network import MLPRegressor
 
-from constants import ACTIONS, STATES, EXPLORATION, X, Y
+from constants import ACTIONS, STATES, EXPLORATION, X, Y, STATE_RADAR_FIRE_TILL, STATE_TILLS_COUNT, STATE_X_Y_POSITION
 from tiles.tile import Tile
 
 
@@ -33,7 +33,10 @@ class Agent:
                                   max_iter=1,
                                   warm_start=True,
                                   learning_rate_init=self.__learning_rate)
-        self.__mlp.fit([[0] * 13], [[0] * len(ACTIONS)])
+        self.__mlp.fit([
+            [0] * (STATE_RADAR_FIRE_TILL + STATE_TILLS_COUNT + STATE_X_Y_POSITION)],
+            [[0] * len(ACTIONS)
+             ])
 
     @property
     def last_action(self) -> str:
