@@ -1,3 +1,4 @@
+import math
 from copy import copy
 
 from agent import Agent
@@ -104,25 +105,33 @@ class Environment:
         reward = 0
         reward += self.calculate_dumb_reward(old_state, action)
         if new_state is None or new_state.position not in self.tiles.keys():
-            return True, REWARD_OUT + self.calculate_dead_trees_reward()
+            return True, REWARD_OUT + self.get_global_reward(old_state)
         tile = self.tiles[new_state.position]
         if tile.type is EMPTY:
             reward += REWARD_FLOOR
-        return False, reward + self.calculate_dead_trees_reward() + self.calculate_fire_dist_reward(new_state)
+        if tile.type in [TREE, BURNING_TREE]:
+            reward += REWARD_TREE
+        return False, reward + self.get_global_reward(new_state)
+
+    def get_global_reward(self, new_state):
+        return self.calculate_dead_trees_reward() + self.calculate_fire_dist_reward(
+            new_state) + self.calculate_burning_trees_reward()
 
     def calculate_dumb_reward(self, old_state, action: str):
-        if old_state is None:
-            return 0
-        if (old_state.type == EMPTY and action in [WATER, CUT_TREE]) or (old_state.type == TREE and action == WATER):
-            return -6
+        # if old_state is None:
+        #     return 0
+        # if (old_state.type == EMPTY and action in [WATER, CUT_TREE]) or (old_state.type == TREE and action == WATER):
+        #     return -6
         return 0
 
     def calculate_fire_dist_reward(self, new_state: Tile) -> float:
-        # nearest_burning_tile = self.get_min_fire_tile_dist(new_state)
-        # if nearest_burning_tile:
-        #     dist = self.get_tile_dist(nearest_burning_tile, new_state)
-        #     reward = REWARD_BURNING_TREE_DIST if dist == 0 else REWARD_BURNING_TREE_DIST / dist
-        #     return reward
+        if new_state is None:
+            return 0
+        nearest_burning_tile = self.get_min_fire_tile_dist(new_state)
+        if nearest_burning_tile:
+            dist = self.get_tile_dist(nearest_burning_tile, new_state)
+            reward = REWARD_BURNING_TREE_DIST if dist == 0 else REWARD_BURNING_TREE_DIST / math.pow(dist, 2)
+            return reward * 10
         return 0
 
     def calculate_dead_trees_reward(self) -> int:
@@ -133,3 +142,7 @@ class Environment:
         self.previous_living_trees = self.get_living_trees()
 
         return destroyed_trees_this_turn * REWARD_DEAD_TREE
+
+    def calculate_burning_trees_reward(self) -> int:
+        print("BURN COUNT", self.get_burning_trees())
+        return self.get_burning_trees() * REWARD_BURNING_TREE

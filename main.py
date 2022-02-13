@@ -24,10 +24,11 @@ class FireAgentGame(arcade.Window):
     """
     agent: Agent
 
-    def __init__(self, max_iterations, is_restore=False):
+    def __init__(self, max_iterations, is_restore=False, is_manual=False):
         """
         Set up the application.
         """
+        self.is_manual = is_manual
         self.max_iterations = max_iterations
         self.env = Environment(FIELD)
         if is_restore:
@@ -65,7 +66,17 @@ class FireAgentGame(arcade.Window):
         self.sprite_list.draw()
 
     def on_update(self, delta_time: float):
-        self.update_time_cnt += delta_time
+        if not self.is_manual:
+            self.update_state()
+
+    def on_key_press(self, symbol: int, modifiers: int):
+        if symbol == arcade.key.SPACE and self.is_manual:
+            self.update_state()
+            # self.__agent.update_history()
+            # self.__agent.reset()
+            # self.__iteration += 1
+
+    def update_state(self):
         if self.env.get_burning_trees():
             action = self.agent.best_action()
             self.env.apply(self.agent, action)
@@ -95,7 +106,7 @@ class FireAgentGame(arcade.Window):
 
 
 def main():
-    game = FireAgentGame(100)
+    game = FireAgentGame(100, False)
     arcade.run()
     # game.run_without_ui()
     game.agent.save(AGENT_FILENAME)
